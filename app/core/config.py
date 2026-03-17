@@ -1,7 +1,11 @@
 from dotenv import load_dotenv
-import os
+from pydantic_settings import BaseSettings
 
 load_dotenv()
 
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+class Settings(BaseSettings):
+    database_url: str
+    ECHO_SQL: bool = False
+
+settings = Settings()

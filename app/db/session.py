@@ -1,21 +1,21 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from app.core.config import DATABASE_URL
+from app.core.config import settings
 
-# 创建数据库连接引擎
-engine = create_engine(DATABASE_URL)
-
-# 创建数据库会话
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+engine = create_async_engine(settings.database_url, echo=settings.ECHO_SQL)
 
 # 创建基类
 Base = declarative_base()
 
-# 创建数据库会话的依赖项 后面services里用Depends(get_db)调用 来操作数据库
-def get_db():
-    db = SessionLocal()
-    try:
+# 创建异步会话
+AsyncSessionLocal = async_sessionmaker(
+    class_=AsyncSession,
+    expire_on_commit=False,
+    autocommit=False,
+    autoflush=False,
+    bind=engine
+)
+async def get_async_db() -> AsyncSession:
+    """依赖函数"""
+    async with AsyncSessionLocal() as db:
         yield db
-    finally:
-        db.close()
