@@ -1,9 +1,9 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.user import User
-from app.schemas.user import UserCreate
-from app.core.utils import get_password_hash
-from app.core.exceptions import UserAlreadyExists, EmailAlreadyExists
+from app.schemas.user import UserCreate, UserLogin
+from app.core.utils import get_password_hash, verify_password
+from app.core.exceptions import UserAlreadyExists, EmailAlreadyExists, AuthenticationError
 
 
 async def register_user_service(user_create: UserCreate, 
@@ -33,3 +33,19 @@ async def register_user_service(user_create: UserCreate,
     await db.commit()
     await db.refresh(new_user) # 刷新获取新增id等自动生成的字段
     return new_user
+
+# 用户登录
+async def login_user_service(user_login: UserLogin, 
+                             db: AsyncSession):
+    
+    # 获取用户
+    result = await db.execute(select(User).where(User.username == user_login.username))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise AuthenticationError("用户名或密码错误")
+
+    # 验证密码
+    if not verify_password(user_login.password, user.password_hash):
+        raise AuthenticationError("用户名或密码错误")
+    
+    return user
