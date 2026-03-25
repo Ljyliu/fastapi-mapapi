@@ -17,3 +17,9 @@ class UserResponse(BaseModel):
 class UserLogin(BaseModel):
     username: str = Field(..., min_length=5, max_length=20,examples=["testuser", "john_doe" ])
     password: str = Field(..., min_length=8, max_length=24, examples=["P@ssw0rd!", "my_password" ])
+
+
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str
+    user: UserResponse

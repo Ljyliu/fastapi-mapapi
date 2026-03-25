@@ -1,12 +1,18 @@
-class UserAlreadyExists(Exception):
-    """用户已存在"""
-    pass
+class CustomException(Exception):
+    """自定义异常"""
+    def __init__(self, code: int, msg: str):
+        self.code = code
+        self.msg = msg
 
-class AuthenticationError(Exception):
-    """认证失败
-    用户不存在或密码错误"""
-    pass
+class UserAlreadyExists(CustomException):
+    def __init__(self):
+        super().__init__(code=400, msg="用户已存在")
+    
 
-class EmailAlreadyExists(Exception):
-    """邮箱已存在"""
-    pass
+class AuthenticationError(CustomException):
+    def __init__(self):
+        super().__init__(code=401, msg="认证失败,用户名或密码错误")
+
+class EmailAlreadyExists(CustomException):
+    def __init__(self):
+        super().__init__(code=400, msg="邮箱已存在")

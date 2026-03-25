@@ -7,7 +7,6 @@ from datetime import datetime,timedelta,timezone
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.core.config import settings
-from app.core.exceptions import UserAlreadyExists, EmailAlreadyExists, AuthenticationError
 from app.db.session import get_async_db
 from app.models.user import User
 
@@ -20,23 +19,6 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
-
-# 异常处理装饰器 将业务层抛出的自定义异常转为http异常
-def handle_exceptions(func):
-    @wraps(func)
-    async def wrapper(*args,**kwargs):
-        try:
-            return await func(*args,**kwargs)
-        except UserAlreadyExists as e:
-            raise HTTPException(status.HTTP_400_BAD_REQUEST,detail=str(e))
-        except EmailAlreadyExists as e:
-            raise HTTPException(status.HTTP_400_BAD_REQUEST,detail=str(e))
-        except AuthenticationError as e:
-            raise HTTPException(status.HTTP_401_UNAUTHORIZED,detail=str(e))
-        except Exception as e:
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="服务器出现错误")
-    
-    return wrapper
 
 
 SECRET_KEY = settings.SECRET_KEY
