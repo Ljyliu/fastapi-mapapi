@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 
 class CustomerResponse(BaseModel):
@@ -12,3 +12,10 @@ class CustomerResponse(BaseModel):
     remark: Optional[str] = ""
 
     model_config = { "from_attributes": True }
+
+
+class CreateCustomer(BaseModel):
+    name: str
+    phone: Optional[str] = Field(None,max_length=20)
+    address: str
+    remark: Optional[str] = ""

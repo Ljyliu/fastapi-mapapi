@@ -4,6 +4,6 @@ from typing import Optional, TypeVar, Generic
 T = TypeVar("T")
 
 class ApiResponse(BaseModel, Generic[T]):
-    code: str = 200
-    message: str = "操作成功"
+    code: int = 0
+    msg: str = "操作成功"
     data: Optional[T] = None

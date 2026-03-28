@@ -9,6 +9,7 @@ from sqlalchemy import select
 from app.core.config import settings
 from app.db.session import get_async_db
 from app.models.user import User
+from app.schemas.user import UserResponse
 
 # 密码加密、验证
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -25,7 +26,7 @@ SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = settings.ALGORITHM
 EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/users/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 # 创建token
 def create_access_token(user_id:int):
@@ -67,7 +68,7 @@ async def get_current_user(
     user = result.scalar_one_or_none()
     if user is None:
         raise login_expired_exception
-    return user    
+    return UserResponse.model_validate(user)
     
 
 
